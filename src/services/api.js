@@ -22,6 +22,8 @@ export const stockApi = {
 export const questionsApi = {
   generate: (stockCode, stockName) =>
     request('/questions/generate', { method: 'POST', body: JSON.stringify({ stockCode, stockName }) }),
+  deep: (stockCode, afterId) =>
+    request(`/questions/deep?stockCode=${encodeURIComponent(stockCode)}&afterId=${afterId}`),
   feedback: (id, useful) =>
     request(`/questions/${id}/feedback`, { method: 'POST', body: JSON.stringify({ useful }) }),
   recent: stockCode => request(`/questions/recent?stockCode=${encodeURIComponent(stockCode)}`),

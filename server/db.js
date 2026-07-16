@@ -36,6 +36,7 @@ function migrate() {
       source_type   TEXT NOT NULL DEFAULT '',
       source_title  TEXT NOT NULL DEFAULT '',
       source_url    TEXT NOT NULL DEFAULT '',
+      analysis_type TEXT NOT NULL DEFAULT 'quick',
       useful        INTEGER,
       created_at    INTEGER NOT NULL DEFAULT (unixepoch())
     );
@@ -74,10 +75,10 @@ function upsertSettings(aiEndpoint, aiApiKey, aiModel) {
 // Questions
 function insertQuestions(items) {
   const stmt = getDb().prepare(
-    'INSERT INTO questions (stock_code, stock_name, question, question_en, source_type, source_title, source_url) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    'INSERT INTO questions (stock_code, stock_name, question, question_en, source_type, source_title, source_url, analysis_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
   )
   return items.map(item => {
-    const r = stmt.run(item.stockCode, item.stockName, item.question, item.questionEn, item.sourceType, item.sourceTitle, item.sourceUrl)
+    const r = stmt.run(item.stockCode, item.stockName, item.question, item.questionEn, item.sourceType, item.sourceTitle, item.sourceUrl, item.analysisType || 'quick')
     return { id: r.lastInsertRowid, ...item }
   })
 }
@@ -90,6 +91,10 @@ function getRecentQuestions(stockCode, limit = 10) {
   return getDb().prepare('SELECT * FROM questions WHERE stock_code = ? ORDER BY created_at DESC LIMIT ?').all(stockCode, limit)
 }
 
+function getDeepQuestions(stockCode, afterId, limit = 3) {
+  return getDb().prepare('SELECT * FROM questions WHERE stock_code = ? AND analysis_type = ? AND id > ? ORDER BY created_at ASC LIMIT ?').all(stockCode, 'deep', afterId, limit)
+}
+
 // Query history
 function insertQueryHistory(keyword, stockCode, stockName) {
   getDb().prepare('INSERT INTO query_history (keyword, stock_code, stock_name) VALUES (?, ?, ?)').run(keyword, stockCode, stockName)
@@ -99,4 +104,4 @@ function getRecentHistory(limit = 10) {
   return getDb().prepare('SELECT * FROM query_history ORDER BY created_at DESC LIMIT ?').all(limit)
 }
 
-module.exports = { getDb, getSettings, upsertSettings, insertQuestions, updateQuestionFeedback, getRecentQuestions, insertQueryHistory, getRecentHistory }
+module.exports = { getDb, getSettings, upsertSettings, insertQuestions, updateQuestionFeedback, getRecentQuestions, getDeepQuestions, insertQueryHistory, getRecentHistory }
