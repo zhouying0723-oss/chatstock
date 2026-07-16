@@ -1,13 +1,15 @@
 <template>
   <div class="question-list">
     <div v-if="store.loading" class="loading">
-      <span class="spinner"></span>
-      <span>正在分析公告与新闻，生成关键问题…</span>
+      <div class="spinner"></div>
+      <span>正在分析公告与新闻…</span>
     </div>
     <div v-else-if="store.error" class="error">{{ store.error }}</div>
     <div v-else-if="store.questions.length">
-      <h3 class="section-title">{{ store.selectedStock?.name }} — 关键问题</h3>
-      <QuestionCard v-for="q in store.questions" :key="q.id || q.question" :question="q" />
+      <h3 class="section-title">{{ store.selectedStock?.name }}</h3>
+      <div class="cards">
+        <QuestionCard v-for="q in store.questions" :key="q.id || q.question" :question="q" />
+      </div>
     </div>
   </div>
 </template>
@@ -22,32 +24,35 @@ const store = useStockStore()
 <style scoped>
 .loading {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  justify-content: center;
-  padding: 40px 0;
+  gap: 16px;
+  padding: 64px 0;
   color: var(--cs-ink-soft);
+  font-size: 15px;
 }
 .spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--cs-border);
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--cs-border);
   border-top-color: var(--cs-accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 .error {
   text-align: center;
-  padding: 24px;
+  padding: 32px;
   color: var(--cs-danger);
   background: rgba(var(--cs-danger-rgb), 0.06);
-  border-radius: var(--cs-radius-md);
+  border-radius: var(--cs-radius-lg);
+  font-size: 15px;
 }
 .section-title {
-  font-size: 16px;
+  font-size: 28px;
   font-weight: 600;
-  margin-bottom: 12px;
-  color: var(--cs-ink);
+  letter-spacing: -0.003em;
+  line-height: 1.1;
+  margin-bottom: 20px;
 }
-.question-list { display: flex; flex-direction: column; gap: 12px; }
+.cards { display: flex; flex-direction: column; gap: 16px; }
 </style>

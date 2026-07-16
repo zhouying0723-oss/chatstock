@@ -16,6 +16,7 @@ export const stockApi = {
   news: keyword => request(`/stock/news?keyword=${encodeURIComponent(keyword)}`),
   recordQuery: (keyword, stockCode, stockName) =>
     request('/stock/query', { method: 'POST', body: JSON.stringify({ keyword, stockCode, stockName }) }),
+  history: () => request('/stock/history'),
 }
 
 export const questionsApi = {

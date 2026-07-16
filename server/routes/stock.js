@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const { searchStocks, getAnnouncements, getNews } = require('../eastmoney')
-const { insertQueryHistory } = require('../db')
+const { insertQueryHistory, getRecentHistory } = require('../db')
 
 const router = Router()
 
@@ -32,6 +32,11 @@ router.post('/query', async (req, res) => {
   }
   insertQueryHistory(keyword, stockCode, stockName)
   res.json({ ok: true })
+})
+
+router.get('/history', (req, res) => {
+  const limit = Math.min(Number(req.query.limit) || 10, 20)
+  res.json(getRecentHistory(limit))
 })
 
 module.exports = router
