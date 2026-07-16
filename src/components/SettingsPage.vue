@@ -16,7 +16,7 @@
       </div>
       <div class="field">
         <label>Model</label>
-        <input v-model="settings.aiModel" placeholder="doubao-1.5-pro-32k" />
+        <input v-model="settings.aiModel" placeholder="doubao-seed-2-0-mini-260428" />
       </div>
 
       <div class="actions">

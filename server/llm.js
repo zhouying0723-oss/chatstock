@@ -1,12 +1,15 @@
 const { getSettings } = require('./db')
 
+const DEFAULT_ENDPOINT = 'https://ark.cn-beijing.volces.com/api/v3/chat/completions'
+const DEFAULT_MODEL = 'doubao-seed-2-0-mini-260428'
+
 async function chatRaw(messages, { endpoint, apiKey, model } = {}) {
   const settings = getSettings()
-  const ep = endpoint || settings?.ai_endpoint
-  const key = apiKey || settings?.ai_api_key
-  const md = model || settings?.ai_model
+  const ep = endpoint || settings?.ai_endpoint || DEFAULT_ENDPOINT
+  const key = apiKey || settings?.ai_api_key || process.env.ARK_API_KEY
+  const md = model || settings?.ai_model || DEFAULT_MODEL
 
-  if (!ep || !key || !md) throw new Error('请先在设置页配置 AI 接口')
+  if (!key) throw new Error('请先在设置页配置 AI 接口或在服务端设置 ARK_API_KEY')
 
   const resp = await fetch(ep, {
     method: 'POST',
