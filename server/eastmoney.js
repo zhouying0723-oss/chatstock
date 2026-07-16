@@ -1,6 +1,6 @@
 const SEARCH_URL = 'https://searchapi.eastmoney.com/api/suggest/get'
 const ANNOUNCEMENT_URL = 'https://np-anotice-stock.eastmoney.com/api/security/ann'
-const NEWS_URL = 'https://search-api-web.eastmoney.com/search/jsonp'
+const NEWS_URL = 'http://search-api-web.eastmoney.com/search/jsonp'
 
 const SEARCH_TOKEN = 'D43BF722C8E33BDC906FB84D85E326E8'
 
@@ -8,10 +8,16 @@ async function fetchJson(url, timeoutMs = 10000) {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeoutMs)
   try {
-    const resp = await fetch(url, { signal: controller.signal })
+    const resp = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' },
+    })
     clearTimeout(timer)
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
-    return await resp.json()
+    const text = await resp.text()
+    // Strip JSONP wrapper if present: callbackName({...})
+    const stripped = text.replace(/^[^(]*\(/, '').replace(/\);?\s*$/, '')
+    return JSON.parse(stripped)
   } catch (e) {
     clearTimeout(timer)
     throw e
@@ -20,7 +26,7 @@ async function fetchJson(url, timeoutMs = 10000) {
 
 async function searchStocks(keyword) {
   try {
-    const url = `${SEARCH_URL}?input=${encodeURIComponent(keyword)}&type=14&token=${SEARCH_TOKEN}`
+    const url = `${SEARCH_URL}?input=${encodeURIComponent(keyword)}&type=14&token=${SEARCH_TOKEN}&cb=`
     const data = await fetchJson(url)
     const items = data?.QuotationCodeTable?.Data || []
     return items
@@ -78,6 +84,7 @@ async function getNews(keyword, pageSize = 5) {
     })
     const url = `${NEWS_URL}?cb=${cb}&param=${encodeURIComponent(param)}&_=${Date.now()}`
     const resp = await fetch(url, {
+      signal: AbortSignal.timeout(10000),
       headers: {
         'Referer': 'https://so.eastmoney.com/',
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
@@ -85,13 +92,13 @@ async function getNews(keyword, pageSize = 5) {
     })
     const text = await resp.text()
     // Strip JSONP wrapper: jQuery_cs(...)
-    const jsonStr = text.replace(/^[^(]+\(/, '').replace(/\);?$/, '')
+    const jsonStr = text.replace(/^[^(]*\(/, '').replace(/\)\s*;?\s*$/, '')
     const data = JSON.parse(jsonStr)
     const items = data?.result?.cmsArticleWebOld || []
     return items.map(item => ({
       title: (item.title || '').replace(/<\/?em>/g, ''),
       content: (item.content || '').replace(/<\/?em>/g, '').slice(0, 200),
-      url: item.code ? `http://finance.eastmoney.com/a/${item.code}.html` : '',
+      url: item.code ? `http://finance.eastmoney.com/a/${item.code}.html` : (item.url || ''),
       displayTime: item.date || '',
       mediaName: item.mediaName || '',
     }))
