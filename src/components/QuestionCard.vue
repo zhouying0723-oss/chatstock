@@ -1,6 +1,7 @@
 <template>
   <div class="question-card" :class="{ useful: question.useful === 1, notUseful: question.useful === 0 }">
     <div class="question-text">{{ question.question }}</div>
+    <div v-if="question.questionEn" class="question-en">{{ question.questionEn }}</div>
     <div class="meta">
       <a v-if="question.sourceUrl" :href="question.sourceUrl" target="_blank" class="source-link">
         {{ sourceLabel }} {{ question.sourceTitle }}
@@ -42,7 +43,8 @@ function feedback(useful) {
 .question-card.useful { border-left: 3px solid #16a34a; }
 .question-card.notUseful { border-left: 3px solid var(--cs-danger); }
 
-.question-text { font-size: 15px; line-height: 1.6; color: var(--cs-ink); }
+.question-text { font-size: 15px; line-height: 1.6; color: var(--cs-ink); font-weight: 500; }
+.question-en { font-size: 13px; line-height: 1.4; color: var(--cs-ink-soft); margin-top: 2px; }
 .meta { margin-top: 8px; }
 .source-link {
   font-size: 13px;

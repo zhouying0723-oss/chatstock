@@ -32,6 +32,7 @@ function migrate() {
       stock_code    TEXT NOT NULL,
       stock_name    TEXT NOT NULL,
       question      TEXT NOT NULL,
+      question_en   TEXT NOT NULL DEFAULT '',
       source_type   TEXT NOT NULL DEFAULT '',
       source_title  TEXT NOT NULL DEFAULT '',
       source_url    TEXT NOT NULL DEFAULT '',
@@ -73,10 +74,10 @@ function upsertSettings(aiEndpoint, aiApiKey, aiModel) {
 // Questions
 function insertQuestions(items) {
   const stmt = getDb().prepare(
-    'INSERT INTO questions (stock_code, stock_name, question, source_type, source_title, source_url) VALUES (?, ?, ?, ?, ?, ?)'
+    'INSERT INTO questions (stock_code, stock_name, question, question_en, source_type, source_title, source_url) VALUES (?, ?, ?, ?, ?, ?, ?)'
   )
   return items.map(item => {
-    const r = stmt.run(item.stockCode, item.stockName, item.question, item.sourceType, item.sourceTitle, item.sourceUrl)
+    const r = stmt.run(item.stockCode, item.stockName, item.question, item.questionEn, item.sourceType, item.sourceTitle, item.sourceUrl)
     return { id: r.lastInsertRowid, ...item }
   })
 }
