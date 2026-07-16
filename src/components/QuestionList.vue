@@ -2,29 +2,29 @@
   <div class="question-list">
     <div v-if="store.loading" class="loading">
       <div class="spinner"></div>
-      <span>正在分析公告与新闻…</span>
+      <span>正在分析…</span>
     </div>
     <div v-else-if="store.error && !store.questions.length" class="error">{{ store.error }}</div>
     <template v-else-if="store.questions.length">
-      <section class="section">
+      <div class="section-header">
         <h3 class="section-title">速览</h3>
-        <p class="section-desc">基于标题快速分析</p>
-        <div class="cards">
-          <QuestionCard v-for="q in store.questions" :key="q.id" :question="q" />
-        </div>
-      </section>
+        <span class="section-tag">标题</span>
+      </div>
+      <div class="cards">
+        <QuestionCard v-for="q in store.questions" :key="q.id" :question="q" />
+      </div>
 
-      <section class="section deep-section">
+      <div class="section-header deep-header">
         <h3 class="section-title">深度</h3>
-        <p class="section-desc">阅读全文后深入分析</p>
-        <div v-if="store.deepLoading" class="deep-loading">
-          <div class="spinner small"></div>
-          <span>正在深度阅读全文…</span>
-        </div>
-        <div v-else-if="store.deepQuestions.length" class="cards">
-          <QuestionCard v-for="q in store.deepQuestions" :key="q.id" :question="q" />
-        </div>
-      </section>
+        <span class="section-tag">全文</span>
+      </div>
+      <div v-if="store.deepLoading" class="deep-loading">
+        <div class="spinner small"></div>
+        <span>阅读全文中…</span>
+      </div>
+      <div v-else-if="store.deepQuestions.length" class="cards">
+        <QuestionCard v-for="q in store.deepQuestions" :key="q.id" :question="q" />
+      </div>
     </template>
   </div>
 </template>
@@ -39,55 +39,63 @@ const store = useStockStore()
 <style scoped>
 .loading {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 64px 0;
+  gap: 12px;
+  padding: 48px 0;
   color: var(--cs-ink-soft);
   font-size: 15px;
 }
 .spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid var(--cs-border);
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--cs-border);
   border-top-color: var(--cs-accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
-.spinner.small { width: 20px; height: 20px; border-width: 2px; }
+.spinner.small { width: 16px; height: 16px; }
 .error {
   text-align: center;
-  padding: 32px;
+  padding: 24px;
   color: var(--cs-danger);
   background: rgba(var(--cs-danger-rgb), 0.06);
-  border-radius: var(--cs-radius-lg);
+  border-radius: var(--cs-radius-md);
   font-size: 15px;
 }
-.section { margin-bottom: 40px; }
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 10px;
+  margin-top: 24px;
+}
+.section-header:first-child { margin-top: 0; }
 .section-title {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.003em;
   line-height: 1.1;
-  margin-bottom: 4px;
 }
-.section-desc {
-  font-size: 14px;
+.section-tag {
+  font-size: 11px;
+  font-weight: 500;
   color: var(--cs-ink-faint);
-  margin-bottom: 20px;
-  letter-spacing: .011em;
+  padding: 2px 8px;
+  border-radius: var(--cs-pill-radius);
+  background: var(--cs-hover);
+  letter-spacing: .02em;
 }
-.deep-section {
-  padding-top: 32px;
+.deep-header {
+  padding-top: 16px;
   border-top: 1px solid var(--cs-border);
 }
 .deep-loading {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 24px 0;
+  gap: 8px;
+  padding: 16px 0;
   color: var(--cs-ink-soft);
-  font-size: 14px;
+  font-size: 13px;
 }
-.cards { display: flex; flex-direction: column; gap: 16px; }
+.cards { display: flex; flex-direction: column; gap: 8px; }
 </style>
