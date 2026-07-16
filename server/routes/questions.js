@@ -42,8 +42,9 @@ function buildDeepPrompt(stockName, announcements, news) {
 1. 中文标题不超过30字，同时提供英文标题（15词以内）
 2. 3个问题必须完全不同，分别关注不同维度
 3. 基于正文内容深入分析，挖掘标题之外的隐含信息和深层影响
-4. 问题要专业且有深度，指向关键判断或潜在影响，不要标题党
-5. 每个问题标注来源序号（公告从A1开始编号，新闻从N1开始编号）`]
+4. 如果正文中有具体数字（金额、比例、日期、数量等），尽量在问题中引用，让问题更具体有说服力
+5. 问题要专业且有深度，指向关键判断或潜在影响，不要标题党
+6. 每个问题标注来源序号（公告从A1开始编号，新闻从N1开始编号）`]
 
   if (announcements.length) {
     parts.push('\n【公告】')
@@ -68,7 +69,7 @@ function buildDeepPrompt(stockName, announcements, news) {
 }
 
 const QUICK_SYSTEM = '你是一位专业的A股分析师，只输出JSON。仅基于公告新闻标题快速生成专业问题，中文30字内+英文15词内，不标题党，3个问题关注不同维度。'
-const DEEP_SYSTEM = '你是一位专业的A股分析师，只输出JSON。基于公告新闻全文内容深入分析生成专业问题，中文30字内+英文15词内，挖掘隐含信息，不标题党，3个问题关注不同维度。'
+const DEEP_SYSTEM = '你是一位专业的A股分析师，只输出JSON。基于公告新闻全文内容深入分析生成专业问题，中文30字内+英文15词内，挖掘隐含信息，引用正文中的具体数字，不标题党，3个问题关注不同维度。'
 
 function mapQuestions(result, stockCode, stockName, announcements, news, analysisType) {
   return (result.questions || []).map(q => {
